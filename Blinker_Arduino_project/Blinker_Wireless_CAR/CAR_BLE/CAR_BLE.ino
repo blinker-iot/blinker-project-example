@@ -109,7 +109,7 @@ void blinker_car_detect()
 
 void setup()
 {
-	Serial.begin(115200);
+    Serial.begin(115200);
 
     blinker_car_init();
 
@@ -118,7 +118,7 @@ void setup()
 
 void loop()
 {
-	Blinker.run();
+    Blinker.run();
 
     uint8_t L_PWM = 0;
     uint8_t R_PWM = 0;
