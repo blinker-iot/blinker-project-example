@@ -1,17 +1,20 @@
 /*
- * Blinker BLE CAR, support Arduino UNO
+ * Blinker WiFi CAR, support WiFiduino
  */
 
 #define BLINKER_PRINT	Serial
-#define BLINKER_BLE
+#define BLINKER_WIFI
 
 #include <Blinker.h>
 
-#define L_DIR_PIN       7
-#define L_PWM_PIN       6
+char ssid[] = "<Your WiFi network SSID or name>";
+char pswd[] = "<Your WiFi network WPA password or WEP key>";
+
+#define L_DIR_PIN       14
+#define L_PWM_PIN       16
 #define R_DIR_PIN       4
 #define R_PWM_PIN       5
-#define C_BAR_PIN       9
+#define C_BAR_PIN       12
 
 uint32_t car_os_time = millis();
 bool isWarn = false;
@@ -24,6 +27,10 @@ void blinker_car_init()
     pinMode(R_PWM_PIN, OUTPUT);
 
     pinMode(C_BAR_PIN, INPUT_PULLUP);
+
+// #if defined(ESP8266)
+    analogWriteRange(255);
+// #endif
 }
 
 void blinker_car_parse(uint8_t &_L_PWM, bool &_L_DIR, uint8_t &_R_PWM, bool &_R_DIR)
@@ -113,7 +120,7 @@ void setup()
 
     blinker_car_init();
 
-    Blinker.begin();
+    Blinker.begin(ssid, pswd);
 }
 
 void loop()
