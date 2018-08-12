@@ -19,6 +19,25 @@ char pswd[] = "<Your WiFi network WPA password or WEP key>";
 uint32_t car_os_time = millis();
 bool isWarn = false;
 
+#define JOY_1 "JOYKey"
+
+BlinkerJoystick JOY1(JOY_1);
+
+void joystick1_callback(uint8_t xAxis, uint8_t yAxis)
+{
+    BLINKER_LOG2("Joystick1 X axis: ", xAxis);
+    BLINKER_LOG2("Joystick1 Y axis: ", yAxis);
+
+    uint8_t L_PWM = 0;
+    uint8_t R_PWM = 0;
+    bool    L_DIR = false;
+    bool    R_DIR = false;
+
+    blinker_car_parse(xAxis, yAxis, L_PWM, L_DIR, R_PWM, R_DIR);
+
+    blinker_car_control(L_PWM, L_DIR, R_PWM, R_DIR);
+}
+
 void blinker_car_init()
 {
     pinMode(L_DIR_PIN, OUTPUT);
@@ -33,11 +52,9 @@ void blinker_car_init()
 // #endif
 }
 
-void blinker_car_parse(uint8_t &_L_PWM, bool &_L_DIR, uint8_t &_R_PWM, bool &_R_DIR)
+void blinker_car_parse(uint8_t xAxis, uint8_t yAxis, uint8_t &_L_PWM, bool &_L_DIR, uint8_t &_R_PWM, bool &_R_DIR)
 {
-    uint8_t xAxis = Blinker.joystick(J_Xaxis);
-    uint8_t yAxis = Blinker.joystick(J_Yaxis);
-    bool    isStop = false;
+    bool isStop = false;
 
     if (yAxis < 128) {
         _L_DIR = true;
@@ -121,20 +138,13 @@ void setup()
     blinker_car_init();
 
     Blinker.begin(ssid, pswd);
+
+    JOY1.attach(joystick1_callback);
 }
 
 void loop()
 {
     Blinker.run();
-
-    uint8_t L_PWM = 0;
-    uint8_t R_PWM = 0;
-    bool    L_DIR = false;
-    bool    R_DIR = false;
-
-    blinker_car_parse(L_PWM, L_DIR, R_PWM, R_DIR);
-
-    blinker_car_control(L_PWM, L_DIR, R_PWM, R_DIR);
 
     blinker_car_detect();
     

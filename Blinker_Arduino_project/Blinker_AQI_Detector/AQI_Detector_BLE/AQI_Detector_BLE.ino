@@ -30,6 +30,20 @@ BLINKER_PMSX003ST pms;
 
 uint32_t os_time_ms;
 
+#define PM_1    "PM1.0"
+#define PM_2_5  "PM2.5"
+#define PM_10   "PM10"
+#define PMS_FA  "FA"
+#define PMS_RH  "RH"
+#define PMS_TP  "TP"
+
+BlinkerNumber PM1(PM_1);
+BlinkerNumber PM25(PM_2_5);
+BlinkerNumber PM10(PM_10);
+BlinkerNumber HCHO(PMS_FA);
+BlinkerNumber HUMI(PMS_RH);
+BlinkerNumber TEMP(PMS_TP);
+
 void drawAQI()
 {
     u8g2.setFont(u8g2_font_helvR10_te);
@@ -124,12 +138,18 @@ void loop()
 
     detectorDisplay();
 
-    Blinker.print("PM1.0", pms.getPmAto(1.0), "ug/m3");
-    Blinker.print("PM2.5", pms.getPmAto(2.5), "ug/m3");
-    Blinker.print("PM10", pms.getPmAto(10), "ug/m3");
-    Blinker.print("FA", (int)pms.getForm(), "ug/m3");
-    Blinker.print("RH", (int)pms.getHumi(), "%");
-    Blinker.print("TP", (int)pms.getTemp(), "°C");
+    PM1.unit("ug/m3");
+    PM1.print(pms.getPmAto(1.0));
+    PM25.unit("ug/m3");
+    PM25.print(pms.getPmAto(2.5));
+    PM10.unit("ug/m3");
+    PM10.print(pms.getPmAto(10));
+    HCHO.unit("ug/m3");
+    HCHO.print(pms.getForm());
+    HUMI.unit("%");
+    HUMI.print(pms.getHumi());
+    TEMP.unit("°C");
+    TEMP.print(pms.getTemp());
 
     Blinker.delay(1000);
 }

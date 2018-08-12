@@ -1,13 +1,10 @@
 #define BLINKER_PRINT	Serial
 #define BLINKER_WIFI
 
-#define RGB1            "rgb"
-#define SLIDER_1        "SliderKey"
-
 #include <Blinker.h>
 
-char ssid[] = "mostfun";
-char pswd[] = "18038083873";
+char ssid[] = "Your WiFi network SSID or name";
+char pswd[] = "Your WiFi network WPA password or WEP key";
 
 #include <Adafruit_NeoPixel.h>
 #ifdef __AVR__
@@ -18,6 +15,29 @@ char pswd[] = "18038083873";
 #define NUMPIXELS      9
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
+#define RGB_1 "RGBKey"
+
+BlinkerRGB RGB1(RGB_1);
+
+void rgb1_callback(uint8_t r_value, uint8_t g_value, uint8_t b_value, uint8_t bright_value)
+{
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    BLINKER_LOG2("R value: ", r_value);
+    BLINKER_LOG2("G value: ", g_value);
+    BLINKER_LOG2("B value: ", b_value);
+    BLINKER_LOG2("Rrightness value: ", bright_value);
+
+    uint8_t colorR = map(r_value, 0, 255, 0, bright_value);
+    uint8_t colorG = map(g_value, 0, 255, 0, bright_value);
+    uint8_t colorB = map(b_value, 0, 255, 0, bright_value);
+
+    for(int i = 0; i < NUMPIXELS; i++){
+        pixels.setPixelColor(i, pixels.Color(colorR,colorG,colorB));
+        pixels.show();
+    }
+}
+
+
 void setup()
 {
     Serial.begin(115200);
@@ -26,9 +46,10 @@ void setup()
     digitalWrite(LED_BUILTIN, LOW);
     
     Blinker.begin(ssid, pswd);
-    Blinker.wInit(RGB1, W_RGB);
-    Blinker.wInit(SLIDER_1, W_SLIDER);
+
     pixels.begin();
+
+    RGB1.attach(rgb1_callback);
 }
 
 void loop()
@@ -44,26 +65,4 @@ void loop()
         Blinker.print(BlinkerTime);
         Blinker.print("millis", BlinkerTime);
     }
-
-    uint8_t colorR = Blinker.rgb(RGB1,R);
-    uint8_t colorG = Blinker.rgb(RGB1,G);
-    uint8_t colorB = Blinker.rgb(RGB1,B);
-
-    uint8_t brightness = Blinker.slider(SLIDER_1);
-
-   BLINKER_LOG2("Red color: ", colorR);
-   BLINKER_LOG2("Green color: ", colorG);
-   BLINKER_LOG2("Blue color: ", colorB);
-   BLINKER_LOG2("brightness: ", brightness);
-
-    colorR = map(colorR, 0, 255, 0, brightness);
-    colorG = map(colorG, 0, 255, 0, brightness);
-    colorB = map(colorB, 0, 255, 0, brightness);
-
-    for(int i=0;i<NUMPIXELS;i++){
-        pixels.setPixelColor(i, pixels.Color(colorR,colorG,colorB));
-        pixels.show();
-    }
-
-   Blinker.delay(2000);
 }
